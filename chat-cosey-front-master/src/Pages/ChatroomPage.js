@@ -8,7 +8,7 @@ const ChatroomPage = ({ match, socket }) => {
   const [messages, setMessages] = React.useState([]);
   const messageRef = React.useRef();
   const [userId, setUserId] = React.useState("");
-
+  
   const sendMessage = () => {
     if (socket) {
       var commande = messageRef.current.value ;
@@ -36,10 +36,78 @@ const ChatroomPage = ({ match, socket }) => {
 
       }
       else{
-        socket.emit("chatroomMessage", {
-          chatroomId,
-          message: messageRef.current.value,
-        });
+        if (commande == "/list")
+        {  
+          axios
+            .get("http://localhost:8000/chatroom", {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("CC_Token"),
+              },
+            })
+            .then((response) => {
+              var string = "";
+              for(var i = 0; i< response.data.length; i++)
+              {
+                string = string + " " + response.data[i].name;
+              }
+              socket.emit("chatroomMessage", {
+                chatroomId,
+                message: string
+              });
+            })
+            .catch((err) => {              
+            });
+        }
+        else {
+          if (commande == "/quit")
+          {
+            window.location.replace("http://localhost:3000/dashboard");
+          }
+          else{
+            if(com[0] == "/delete"){
+              axios
+              .get("http://localhost:8000/chatroom", {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("CC_Token"),
+                },
+              })
+              .then((response) => {
+                var string = "";
+                for(var i = 0; i< response.data.length; i++)
+                {
+                  string = string + " " + response.data[i].name;
+                  if(response.data[i].name == com[1]){
+                    axios
+                    .delete("http://localhost:8000/chatroom",{
+                      headers: {
+                        Authorization: "Bearer " + localStorage.getItem("CC_Token"),
+                      },
+                    })
+                    .then((response) => {
+                      console.log("DELETE");
+                    })
+                  }
+                  
+                }
+                socket.emit("chatroomMessage", {
+                  chatroomId,
+                  message: string
+                });
+              })
+              .catch((err) => {              
+              });
+            }
+            else{
+              socket.emit("chatroomMessage", {
+                chatroomId,
+                message: messageRef.current.value,
+              });
+            }
+            
+          }
+          
+        }
+        
       }
       messageRef.current.value = "";
     }

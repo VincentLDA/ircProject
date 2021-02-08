@@ -27,6 +27,7 @@ const server = app.listen(8000, () => {
 
 const io = require("socket.io")(server);
 const jwt = require("jwt-then");
+const { name } = require("./app");
 
 const Message = mongoose.model("Message");
 const User = mongoose.model("User");
@@ -54,11 +55,11 @@ io.on("connection", (socket) => {
     socket.join(chatroomId);    
     console.log("A user joined chatroom: " + chatroomId);
     const userName = User.findOne({ _id: socket.userId });
-    io.to(chatroomId).emit("newMessage", {
-      message: "Bienvenue à toi " + socket.name ,
-      name: "SERVEUR "
-    });
-    
+    //console.log(userName.name);
+    // io.to(chatroomId).emit("newMessage", {
+    //   message: "Bienvenue à toi " + userName.name ,
+    //   name: "SERVEUR "
+    // });    
   });
 
   socket.on("leaveRoom", ({ chatroomId }) => {

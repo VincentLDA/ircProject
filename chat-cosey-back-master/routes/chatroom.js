@@ -6,5 +6,6 @@ const auth = require("../middlewares/auth");
 
 router.get("/", auth, catchErrors(chatroomController.getAllChatrooms));
 router.post("/", catchErrors(chatroomController.createChatroom));
+router.delete("/delete", catchErrors(chatroomController.deleteChatroom));
 
 module.exports = router;
